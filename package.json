@@ -1,6 +1,6 @@
 {
   "name": "webpack-css-treeshaking-plugin",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "a webpack plugin to shake unused css code.",
   "repository": {
     "type": "git",

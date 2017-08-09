@@ -1,100 +1,160 @@
-const classNameRegex = /\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?![^\{]*\})/gi
-const classInJSRegex = /class(?:Name)?\s*=\s*(?:'|")(.*?)(?:'|")/g
-// const classInJSRegex = className => {
-//   const re = new RegExp(
-//     `class(Name)?\s*=\s*('|")([-_a-zA-Z0-9-\\s]*)?` + className + `([-_a-zA-Z0-9-\\s]*)('|")`,
-//     'g'
-//   )
-//   return re
-// }
-const classInCSSRegex = className => {
-  const re = RegExp(`\.` + className + `(\\s)?{[^\}]*\}`)
-  return re
+const postcss = require('postcss')
+const cssshaking = require('postcss-tree-shaking')
+const fs = require('fs')
+const loaderUtils = require('loader-utils')
+
+const NS = fs.realpathSync(__dirname)
+
+function cleanMap (map) {
+  if (map.sources) {
+    map.sources = map.sources.map((url) => url.split('://').pop())
+  }
+  return map
 }
 
-export class WebpackCssTreeShakingPlugin {
-  constructor (options) {
-    this.options = Object.assign({}, { remove: true, showInfo: true }, options)
-  }
+function filterModules (module) {
+  return module.loaders && module.loaders.reduce((r, l) => (r || l.loader.includes('/css-treeshaking-loader/')), false)
+}
 
-  apply (compiler) {
-    compiler.plugin('emit', (compilation, callback) => {
-      // css文件
-      const styleFiles = Object.keys(compilation.assets).filter(asset => {
-        return /\.css$/.test(asset)
+class CSSTreeshakingLoader {
+  constructor (compilation, query) {
+    this.options = {
+      plugins: false,
+      spinalCase: false,
+      ignore: [],
+      allowIds: false,
+      allowNonClassSelectors: false,
+      allowNonClassCombinators: false
+    }
+    if (query) {
+      Object.assign(this.options, query)
+    }
+    this.modules = []
+
+    const options = Object.assign({}, compilation.compiler.options)
+    options.output = Object.assign({}, options.output)
+    if (!this.options.plugin) {
+      options.plugins = []
+    }
+    delete options.devtool
+
+    const childCompiler = require('webpack/lib/webpack')(options)
+    // Increment recursion counter
+    childCompiler[NS] = compilation.compiler[NS] + 1
+
+    // Save our modules
+    childCompiler.plugin('compilation', (comp) => {
+      comp.plugin('after-optimize-modules', (modules) => {
+        this.modules = modules.filter(filterModules)
       })
-      // js文件
-      const jsFiles = Object.keys(compilation.assets).filter(asset => {
-        return /\.(js|jsx)$/.test(asset)
-      })
-
-      // 获取所有的className数组
-      const classNamesInStyles = styleFiles.reduce((acc, filename) => {
-        const source = compilation.assets[filename].source()
-        const match = source.match(classNameRegex).map(str => str.slice(1))
-        acc = acc.concat(match)
-        return acc
-      }, [])
-
-      // 获取所有js的代码字符串
-      const jsContents = jsFiles.reduce((acc, filename) => {
-        const contents = compilation.assets[filename].source()
-        acc += contents
-        return acc
-      }, '')
-
-      // 获取所有js中没有出现的className
-      const classesNotInJS = classNamesInStyles.filter(className => {
-        if (
-          this.options.ignore &&
-          this.options.ignore.indexOf(className) !== -1
-        ) {
-          return false
-        }
-        let result = jsContents.match(classInJSRegex).some((str) => {
-          let mats = str.match(classInJSRegex)
-          if (mats && mats.length === 2) {
-            let cn = mats[1]
-            return cn === className || new RegExp(`${cn}\s*:`).test(className)
-          }
+    })
+    childCompiler.plugin('after-compile', (comp, callback) => {
+      // Remove all chunk assets
+      comp.chunks.forEach(function (chunk) {
+        chunk.files.forEach(function (file) {
+          delete comp.assets[file]
         })
-        return !!result
-      })
-
-      // 重复className删除
-      const classesDeduped = classesNotInJS.reduce((acc, cur) => {
-        if (acc.indexOf(cur) === -1) {
-          acc.push(cur)
-        }
-        return acc
-      }, [])
-
-      if (this.options.showInfo) {
-        console.log(`Removing css classes:[${classesDeduped}]`)
-      }
-
-      if (!this.options.remove) {
-        callback()
-        return
-      }
-
-      const updatedStyles = styleFiles.map(function (filename) {
-        const source = compilation.assets[filename].source()
-
-        let replaced = classesDeduped.reduce((acc, className) => {
-          return acc.replace(classInCSSRegex(className), '')
-        }, source)
-
-        return replaced
-      })
-
-      styleFiles.forEach((filename, i) => {
-        compilation.assets[filename] = {
-          source: () => updatedStyles[i],
-          size: () => updatedStyles[i].length
-        }
       })
       callback()
     })
+    this.childCompiler = childCompiler
   }
+
+  doChildCompilation () {
+    if (!this.compilePromise) {
+      this.compilePromise = new Promise((resolve, reject) => {
+        this.childCompiler.run((err) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
+      })
+    }
+    return this.compilePromise
+  }
+
+  filterCSS (loaderContext, source, sourceMap) {
+    return new Promise((resolve, reject) => {
+      this.doChildCompilation().then(() => {
+        const module = this.getModule(loaderContext.request)
+
+        if (module.error) {
+          return reject(module.error)
+        }
+
+        if (module.usedExports === true || module.usedExports === false || module.usedExports.indexOf('default') !== -1) {
+          return resolve({ source: source, map: sourceMap })
+        }
+
+        let usedSelectors = module.usedExports.filter((selector) => selector !== '$css')
+
+        if (this.options.spinalCase) {
+          usedSelectors = usedSelectors.concat(
+                        usedSelectors.map((selector) => selector.replace(/([a-z0-9])([A-Z])/g, (match, p1, p2) => p1 + '-' + p2.toLowerCase()))
+                    )
+        }
+
+        postcss([
+          cssshaking({
+            used: usedSelectors,
+            ignore: this.options.ignore,
+            allowIds: this.options.allowIds,
+            allowNonClassSelectors: this.options.allowNonClassSelectors,
+            allowNonClassCombinators: this.options.allowNonClassCombinators
+          })
+        ]).process(source, {
+          from: loaderUtils.getRemainingRequest(loaderContext),
+          to: loaderUtils.getCurrentRequest(loaderContext),
+          map: {
+            prev: sourceMap,
+            sourcesContent: true,
+            inline: false,
+            annotation: false
+          }
+        }).then((result) => {
+          resolve({ source: result.css, map: cleanMap(result.map.toJSON())})
+        }).catch((error) => {
+          reject(error)
+        })
+      }).catch((err) => reject(err))
+    })
+  }
+
+  getModule (request) {
+    return this.modules.filter((module) => module.request.includes(request))[0]
+  }
+}
+
+function loader (source, map) {
+  if (this.cacheable) this.cacheable()
+
+  const query = loaderUtils.parseQuery(this.query)
+
+  if (typeof query.recursion === 'undefined') {
+    query.recursion = 1
+  }
+
+  if (typeof this._compiler[NS] === 'undefined') {
+    this._compiler[NS] = 0
+  }
+    // Don't apply transform to final recursion
+  if (this._compiler[NS] === query.recursion) {
+    this.callback(null, source, map)
+  } else {
+    const callback = this.async()
+
+        // Save loader instance on the compilation
+    const loaderId = 'DeadCSSLoader' + (typeof this.query === 'string' ? this.query : '?' + JSON.stringify(this.query))
+    this._compilation[loaderId] = this._compilation[loaderId] || new CSSTreeshakingLoader(this._compilation, query)
+
+    this._compilation[loaderId].filterCSS(this, source, map).then((result) => {
+      callback(null, result.source, result.map)
+    }).catch((err) => callback(err))
+  }
+}
+
+loader.extract = function (options) {
+  return { loader: require.resolve('./extract'), query: options }
 }
