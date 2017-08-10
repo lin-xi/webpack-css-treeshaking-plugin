@@ -38,6 +38,7 @@ class CSSTreeshakingLoader {
     }
     delete options.devtool
 
+    console.log('👠👠👠👠👠👠', 'webpack options', options)
     const childCompiler = require('webpack/lib/webpack')(options)
     // Increment recursion counter
     childCompiler[NS] = compilation.compiler[NS] + 1
@@ -59,10 +60,12 @@ class CSSTreeshakingLoader {
       callback()
     })
     this.childCompiler = childCompiler
+    console.log('👠👠👠👠👠👠', 'this.childCompiler', this.childCompiler)
   }
 
   doChildCompilation () {
     if (!this.compilePromise) {
+      console.log('👠👠👠👠👠👠', 'this.compilePromise is null')
       this.compilePromise = new Promise((resolve, reject) => {
         this.childCompiler.run((err) => {
           if (err) {
@@ -78,7 +81,6 @@ class CSSTreeshakingLoader {
   }
 
   filterCSS (loaderContext, source, sourceMap) {
-    console.log('👠👠👠👠👠👠', 'filterCSS', source)
     return new Promise((resolve, reject) => {
       this.doChildCompilation().then(() => {
         console.log('👠👠👠👠👠👠', 'doChildCompilation.done', loaderContext.request)
