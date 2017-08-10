@@ -46,6 +46,7 @@ class CSSTreeshakingLoader {
     childCompiler.plugin('compilation', (comp) => {
       comp.plugin('after-optimize-modules', (modules) => {
         this.modules = modules.filter(filterModules)
+        console.log('👠👠👠👠👠👠', this.modules)
       })
     })
     childCompiler.plugin('after-compile', (comp, callback) => {
@@ -76,6 +77,7 @@ class CSSTreeshakingLoader {
   }
 
   filterCSS (loaderContext, source, sourceMap) {
+    console.log('👠👠👠👠👠👠', sourceMap)
     return new Promise((resolve, reject) => {
       this.doChildCompilation().then(() => {
         const module = this.getModule(loaderContext.request)
@@ -128,6 +130,7 @@ class CSSTreeshakingLoader {
 }
 
 function loader (source, map) {
+  console.log('👠👠👠👠👠👠', 'css-treeshaking-loader')
   if (this.cacheable) this.cacheable()
 
   const query = loaderUtils.parseQuery(this.query)
