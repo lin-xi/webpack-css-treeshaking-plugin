@@ -163,12 +163,15 @@ function loader (source, map) {
 
     this._compilation[loaderId].filterCSS(this, source, map).then((result) => {
       callback(null, result.source, result.map)
-    }).catch((err) => callback(err))
+    }).catch((err) => {
+      console.log('filterCSS error', err)
+      callback(err)
+    })
   }
 }
 
 loader.extract = function (options) {
-  return { loader: require.resolve('./extract'), query: options }
+  return { loader: require('./extract'), query: options }
 }
 
 module.exports = loader
