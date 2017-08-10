@@ -1,10 +1,10 @@
 {
-  "name": "css-treeshaking-loader",
-  "version": "1.1.1",
+  "name": "webpack-css-treeshaking-plugin",
+  "version": "1.1.2",
   "description": "a webpack loader to shake unused css code.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lin-xi/css-treeshaking-loader"
+    "url": "https://github.com/lin-xi/webpack-css-treeshaking-plugin"
   },
   "main": "lib/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
-    "webpack-loader",
+    "webpack-plugin",
     "css tree shaking",
     "tree-shake"
   ],
@@ -35,7 +35,5 @@
     "plugins": []
   },
   "dependencies": {
-    "postcss-tree-shaking": "^1.0.0",
-    "webpack": "^3.5.2"
   }
 }
