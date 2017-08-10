@@ -1,7 +1,7 @@
 var postcss = require('postcss')
 var treeShakingPlugin = require('./treeShakingPlugin')
 
-export class CSSTreeShakingPlugin {
+class CSSTreeShakingPlugin {
   constructor (options) {
     this.options = Object.assign({}, {remove: true, showInfo: true}, options)
   }
@@ -43,3 +43,5 @@ export class CSSTreeShakingPlugin {
 	  })
   }
 }
+
+module.exports = CSSTreeShakingPlugin;
