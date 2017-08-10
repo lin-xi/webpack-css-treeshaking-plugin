@@ -47,11 +47,12 @@ class CSSTreeshakingLoader {
     childCompiler.plugin('compilation', (comp) => {
       comp.plugin('after-optimize-modules', (modules) => {
         this.modules = modules.filter(filterModules)
-        console.log('👠👠👠👠👠👠', this.modules)
+        console.log('👠👠👠👠👠👠', 'compilation', this.modules)
       })
     })
     childCompiler.plugin('after-compile', (comp, callback) => {
       // Remove all chunk assets
+      console.log('👠👠👠👠👠👠', 'after-compile', comp.chunks)
       comp.chunks.forEach(function (chunk) {
         chunk.files.forEach(function (file) {
           delete comp.assets[file]
@@ -64,14 +65,13 @@ class CSSTreeshakingLoader {
 
   doChildCompilation () {
     if (!this.compilePromise) {
-      console.log('👠👠👠👠👠👠', 'this.compilePromise is null')
       this.compilePromise = new Promise((resolve, reject) => {
-        console.log('👠👠👠👠👠👠', 'this.compilePromise.run', this.childCompiler.run)
         this.childCompiler.run((err) => {
           if (err) {
             console.log('👠👠👠👠👠👠', 'childCompiler.run err', err)
             reject(err)
           } else {
+            console.log('👠👠👠👠👠👠', 'childCompiler.run ok')
             resolve()
           }
         })
