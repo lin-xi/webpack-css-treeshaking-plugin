@@ -59,7 +59,6 @@ class CSSTreeshakingLoader {
       callback()
     })
     this.childCompiler = childCompiler
-    console.log('👠👠👠👠👠👠', 'filterCSS', childCompiler)
   }
 
   doChildCompilation () {
@@ -82,9 +81,11 @@ class CSSTreeshakingLoader {
     console.log('👠👠👠👠👠👠', 'filterCSS', source)
     return new Promise((resolve, reject) => {
       this.doChildCompilation().then(() => {
+        console.log('👠👠👠👠👠👠', 'doChildCompilation.done', loaderContext.request)
         const module = this.getModule(loaderContext.request)
-
+        console.log('👠👠👠👠👠👠', 'module', module)
         if (module.error) {
+          console.log('👠👠👠👠👠👠', 'module.error', module.error)
           return reject(module.error)
         }
 
@@ -129,6 +130,7 @@ class CSSTreeshakingLoader {
   }
 
   getModule (request) {
+    console.log('👠👠👠👠👠👠', 'this.modules', this.modules)
     return this.modules.filter((module) => module.request.includes(request))[0]
   }
 }
