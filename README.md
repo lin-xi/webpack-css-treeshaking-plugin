@@ -1,21 +1,20 @@
-# webpack-css-treeshaking-plugin
+# css-treeshaking-loader
 
-
-a webpack plugin to shake unused css code
+a webpack loader to shake unused css code
 
 -------
 
 ## how to use
 
 ```javascript
-npm install webpack-css-treeshaking-plugin -D
+npm install css-treeshaking-loader -D
 ```
 
 config it in your webpack config file
 
 ```javascript
 const webpack = require("webpack");
-const CssTreeShakingPlugin = require("webpack-css-treeshaking-plugin")
+const CssTreeShakingPlugin = require("css-treeshaking-loader")
 
 module.exports = {
   plugins: [
