@@ -87,7 +87,7 @@ class CSSTreeshakingLoader {
         if (module.usedExports === true || module.usedExports === false || module.usedExports.indexOf('default') !== -1) {
           return resolve({ source: source, map: sourceMap })
         }
-
+        console.log(module.usedExports)
         let usedSelectors = module.usedExports.filter((selector) => selector !== '$css')
 
         if (this.options.spinalCase) {
@@ -146,7 +146,7 @@ function loader (source, map) {
     const callback = this.async()
 
         // Save loader instance on the compilation
-    const loaderId = 'DeadCSSLoader' + (typeof this.query === 'string' ? this.query : '?' + JSON.stringify(this.query))
+    const loaderId = 'CSSTreeShakingLoader' + (typeof this.query === 'string' ? this.query : '?' + JSON.stringify(this.query))
     this._compilation[loaderId] = this._compilation[loaderId] || new CSSTreeshakingLoader(this._compilation, query)
 
     this._compilation[loaderId].filterCSS(this, source, map).then((result) => {
