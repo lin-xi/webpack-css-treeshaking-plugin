@@ -161,3 +161,5 @@ function loader (source, map) {
 loader.extract = function (options) {
   return { loader: require.resolve('./extract'), query: options }
 }
+
+module.exports = loader

@@ -1,6 +1,6 @@
 {
   "name": "css-treeshaking-loader",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a webpack loader to shake unused css code.",
   "repository": {
     "type": "git",
