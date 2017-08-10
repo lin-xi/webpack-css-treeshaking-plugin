@@ -77,7 +77,7 @@ class CSSTreeshakingLoader {
   }
 
   filterCSS (loaderContext, source, sourceMap) {
-    console.log('👠👠👠👠👠👠', sourceMap)
+    console.log('👠👠👠👠👠👠', 'filterCSS', source)
     return new Promise((resolve, reject) => {
       this.doChildCompilation().then(() => {
         const module = this.getModule(loaderContext.request)
@@ -89,7 +89,7 @@ class CSSTreeshakingLoader {
         if (module.usedExports === true || module.usedExports === false || module.usedExports.indexOf('default') !== -1) {
           return resolve({ source: source, map: sourceMap })
         }
-        console.log(module.usedExports)
+        console.log('usedExports', module.usedExports)
         let usedSelectors = module.usedExports.filter((selector) => selector !== '$css')
 
         if (this.options.spinalCase) {
@@ -97,6 +97,7 @@ class CSSTreeshakingLoader {
                         usedSelectors.map((selector) => selector.replace(/([a-z0-9])([A-Z])/g, (match, p1, p2) => p1 + '-' + p2.toLowerCase()))
                     )
         }
+        console.log('usedSelectors', usedSelectors)
 
         postcss([
           cssshaking({
@@ -116,6 +117,7 @@ class CSSTreeshakingLoader {
             annotation: false
           }
         }).then((result) => {
+          console.log('result.css', result.css)
           resolve({ source: result.css, map: cleanMap(result.map.toJSON())})
         }).catch((error) => {
           reject(error)
@@ -150,6 +152,7 @@ function loader (source, map) {
 
         // Save loader instance on the compilation
     const loaderId = 'CSSTreeShakingLoader' + (typeof this.query === 'string' ? this.query : '?' + JSON.stringify(this.query))
+    console.log('👠👠👠👠👠👠', 'loaderId', loaderId)
     this._compilation[loaderId] = this._compilation[loaderId] || new CSSTreeshakingLoader(this._compilation, query)
 
     this._compilation[loaderId].filterCSS(this, source, map).then((result) => {
