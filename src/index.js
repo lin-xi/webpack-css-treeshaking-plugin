@@ -59,6 +59,7 @@ class CSSTreeshakingLoader {
       callback()
     })
     this.childCompiler = childCompiler
+    console.log('👠👠👠👠👠👠', 'filterCSS', childCompiler)
   }
 
   doChildCompilation () {
@@ -66,6 +67,7 @@ class CSSTreeshakingLoader {
       this.compilePromise = new Promise((resolve, reject) => {
         this.childCompiler.run((err) => {
           if (err) {
+            console.log('👠👠👠👠👠👠', 'childCompiler.run err', err)
             reject(err)
           } else {
             resolve()
