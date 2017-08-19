@@ -11,10 +11,12 @@ class CSSTreeShakingPlugin {
 		  const styleFiles = Object.keys(compilation.assets).filter(asset => {
 			  return /\.css$/.test(asset)
 		  })
+      console.log('>>>>>>>', 'compilation.styleFiles', styleFiles)
 
 		  const jsFiles = Object.keys(compilation.assets).filter(asset => {
-			  return /\.(js|jsx)$/.test(asset)
+    return /\.(js|jsx)$/.test(asset)
   })
+      console.log('>>>>>>>', 'compilation.jsFiles', jsFiles)
 
       const jsContents = jsFiles.reduce((acc, filename) => {
 			  const contents = compilation.assets[filename].source()
@@ -44,4 +46,4 @@ class CSSTreeShakingPlugin {
   }
 }
 
-module.exports = CSSTreeShakingPlugin;
+module.exports = CSSTreeShakingPlugin
