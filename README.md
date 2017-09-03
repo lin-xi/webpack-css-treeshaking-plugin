@@ -14,7 +14,7 @@ config it in your webpack config file
 
 ```javascript
 const webpack = require("webpack");
-const CssTreeShakingPlugin = require("wepack-css-treeshaking-plugin")
+const CssTreeShakingPlugin = require("webpack-css-treeshaking-plugin");
 
 module.exports = {
   plugins: [
