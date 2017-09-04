@@ -8,9 +8,10 @@ class CSSTreeShakingPlugin {
 
   apply (compiler) {
     compiler.plugin('emit', (compilation, callback) => {
+      console.log('>>>>>>>', 'compilation', compilation)
 		  const styleFiles = Object.keys(compilation.assets).filter(asset => {
 			  return /\.css$/.test(asset)
-		  })
+      })
       console.log('>>>>>>>', 'compilation.styleFiles', styleFiles)
 
 		  const jsFiles = Object.keys(compilation.assets).filter(asset => {
