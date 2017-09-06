@@ -76,6 +76,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       checkRule(rule).then(result => {
         if (!result) {
           let log = ' ✂️ [' + rule.toString() + '] shaked'
+          console.log(log)
           postcssResult.warn(log)
           rule.remove()
         }
