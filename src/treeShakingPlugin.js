@@ -39,11 +39,13 @@ module.exports = postcss.plugin('list-selectors', function (options) {
         }
 
         let result = true
+        console.log('rule type>>>:', rule.type)
         rule.selectors.forEach(function (selector) {
+          console.log('selector type>>>:', selector.type)
+          if (_.includes(['comment', 'combinator', 'pseudo'], selector.type)) return
           let processor = parser(function (selectors) {
             for (let i = 0, len = selectors.nodes.length; i < len; i++) {
               let node = selectors.nodes[i]
-              if (_.includes(['comment', 'combinator', 'pseudo'], node.type)) continue
               for (let j = 0, len2 = node.nodes.length; j < len2; j++) {
                 let n = node.nodes[j]
                 if (!notCache[n.toString()]) {
@@ -73,6 +75,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
     cssRoot.walkRules(function (rule) {
       // Ignore keyframes, which can log e.g. 10%, 20% as selectors
       if (rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name)) return
+      console.log('rule>>>:', rule.toString())
       checkRule(rule).then(result => {
         if (!result) {
           let log = ' ✂️ [' + rule.toString() + '] shaked'
