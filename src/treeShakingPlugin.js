@@ -37,15 +37,12 @@ module.exports = postcss.plugin('list-selectors', function (options) {
           )
           resolve(true)
         }
-
-        let result = true
-        console.log('rule type>>>:', rule.type)
-        rule.selectors.forEach(function (selector) {
-          console.log('selector type>>>:', selector.type)
-          if (_.includes(['comment', 'combinator', 'pseudo'], selector.type)) return
+        let secs = rule.selectors.filter(function (selector) {
+          let result = true
           let processor = parser(function (selectors) {
             for (let i = 0, len = selectors.nodes.length; i < len; i++) {
               let node = selectors.nodes[i]
+              if (_.includes(['comment', 'combinator', 'pseudo'], node.type)) continue
               for (let j = 0, len2 = node.nodes.length; j < len2; j++) {
                 let n = node.nodes[j]
                 if (!notCache[n.toString()]) {
@@ -67,21 +64,29 @@ module.exports = postcss.plugin('list-selectors', function (options) {
             }
           })
           processor.process(selector)
+          return result
         })
-        resolve(result)
+        resolve({
+          selectors: secs
+        })
       })
     }
 
     cssRoot.walkRules(function (rule) {
       // Ignore keyframes, which can log e.g. 10%, 20% as selectors
       if (rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name)) return
-      console.log('rule>>>:', rule.toString())
       checkRule(rule).then(result => {
-        if (!result) {
-          let log = ' ✂️ [' + rule.toString() + '] shaked'
+        if (result.selectors.length === 0) {
+          let log = ' ✂️ [' + rule.selector + '] shaked'
           console.log(log)
-          postcssResult.warn(log)
           rule.remove()
+        } else {
+          let shaked = rule.selectors.filter(item => {
+            return result.selectors.indeOf(item) > -1
+          })
+          let log = ' ✂️ [' + shaked.join(' ') + '] shaked'
+          console.log(log)
+          rule.selectors = result.selectors
         }
       })
     })
