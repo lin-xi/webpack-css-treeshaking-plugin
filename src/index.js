@@ -8,42 +8,41 @@ class CSSTreeShakingPlugin {
 
   apply (compiler) {
     compiler.plugin('emit', (compilation, callback) => {
-      console.log('>>>>>>>', 'compilation', compilation)
-		  const styleFiles = Object.keys(compilation.assets).filter(asset => {
-			  return /\.css$/.test(asset)
+      let styleFiles = Object.keys(compilation.assets).filter(asset => {
+        return /\.css$/.test(asset)
       })
-      console.log('>>>>>>>', 'compilation.styleFiles', styleFiles)
 
-		  const jsFiles = Object.keys(compilation.assets).filter(asset => {
-    return /\.(js|jsx)$/.test(asset)
-  })
-      console.log('>>>>>>>', 'compilation.jsFiles', jsFiles)
+      let jsFiles = Object.keys(compilation.assets).filter(asset => {
+        return /\.(js|jsx)$/.test(asset)
+      })
 
-      const jsContents = jsFiles.reduce((acc, filename) => {
-			  const contents = compilation.assets[filename].source()
-			  acc += contents
-			  return acc
+      let jsContents = jsFiles.reduce((acc, filename) => {
+        let contents = compilation.assets[filename].source()
+        acc += contents
+        return acc
       }, '')
 
       let tasks = []
       styleFiles.forEach((filename) => {
         const source = compilation.assets[filename].source()
         let listOpts = {
-          include: 'ids',
+          include: '',
           source: jsContents
         }
-        tasks.push(postcss(treeShakingPlugin(listOpts, (src) => {
+        tasks.push(postcss(treeShakingPlugin(listOpts)).process(source).then(result => {
+          let css = result.toString()
           compilation.assets[filename] = {
-            source: () => src,
-            size: () => src.length
+            source: () => css,
+            size: () => css.length
           }
-        })).process(source))
+          return result
+        }))
       })
 
-      Promise.all(tasks).then(() => {
+      Promise.all(tasks).then((data) => {
         callback()
       })
-	  })
+    })
   }
 }
 
