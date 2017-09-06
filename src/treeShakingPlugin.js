@@ -82,7 +82,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
           rule.remove()
         } else {
           let shaked = rule.selectors.filter(item => {
-            return result.selectors.indexOf(item) > -1
+            return result.selectors.indexOf(item) === -1
           })
           let log = ' ✂️ [' + shaked.join(' ') + '] shaked'
           console.log(log)
