@@ -1,5 +1,6 @@
 var postcss = require('postcss')
 var parser = require('postcss-selector-parser')
+var _ = require('lodash')
 
 const classInJSRegex = (className) => {
   const re = new RegExp(`('|")([-_a-zA-Z0-9-\\s]*)?` + className + `([-_a-zA-Z0-9-\\s]*)('|")`, 'g')
