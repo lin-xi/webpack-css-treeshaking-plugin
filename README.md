@@ -18,9 +18,13 @@ const CssTreeShakingPlugin = require("wepack-css-treeshaking-plugin")
 
 module.exports = {
   plugins: [
-    new CssTreeShakingPlugin({}),
+    new CssTreeShakingPlugin(),
     ...
   ]
 };
 ```
+
+## architechture
+<img src="architechture.png">
+
 
