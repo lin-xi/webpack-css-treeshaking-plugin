@@ -10,16 +10,18 @@ a webpack plugin to shake unused css code
 npm install webpack-css-treeshaking-plugin -D
 ```
 
-config it in your webpack config file
+config it in your webpack configuration file, it depends on extracting styles to a file, so please use ExtractTextPlugin first. 
 
 ```javascript
-const webpack = require("webpack");
-const CssTreeShakingPlugin = require("wepack-css-treeshaking-plugin")
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
+const CssTreeShakingPlugin = require("webpack-css-treeshaking-plugin")
 
 module.exports = {
   plugins: [
     new CssTreeShakingPlugin(),
-    ...
+    new ExtractTextPlugin({
+      filename: 'build/style.css'
+    })
   ]
 };
 ```
