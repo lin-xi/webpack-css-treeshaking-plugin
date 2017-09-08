@@ -84,8 +84,13 @@ module.exports = postcss.plugin('list-selectors', function (options) {
           let shaked = rule.selectors.filter(item => {
             return result.selectors.indexOf(item) === -1
           })
-          let log = ' ✂️ [' + shaked.join(' ') + '] shaked'
-          console.log(log)
+          if (shaked && shaked.length > 0) {
+            let log = ' ✂️ [' + shaked.join(' ') + '] shaked'
+            console.log(log)
+          } else {
+            let log = ' ✂️ [' + rule.selector + '] shaked'
+            console.log(log)
+          }
           rule.selectors = result.selectors
         }
       })
