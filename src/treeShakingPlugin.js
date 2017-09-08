@@ -47,6 +47,9 @@ module.exports = postcss.plugin('list-selectors', function (options) {
                 let n = node.nodes[j]
                 if (!notCache[n.value]) {
                   switch (n.type) {
+                    case 'tag':
+                      // nothing
+                      break
                     case 'id':
                     case 'class':
                       if (!classInJs(n.value)) {
@@ -54,6 +57,9 @@ module.exports = postcss.plugin('list-selectors', function (options) {
                         result = false
                         break
                       }
+                      break
+                    default:
+                      // nothing
                       break
                   }
                 } else {
@@ -77,7 +83,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       if (rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name)) return
       checkRule(rule).then(result => {
         if (result.selectors.length === 0) {
-          let log = ' ✂️ [' + rule.selector + '] shaked'
+          let log = ' ✂️ [' + rule.selector + '] shaked, [1]'
           console.log(log)
           rule.remove()
         } else {
@@ -85,10 +91,10 @@ module.exports = postcss.plugin('list-selectors', function (options) {
             return result.selectors.indexOf(item) === -1
           })
           if (shaked && shaked.length > 0) {
-            let log = ' ✂️ [' + shaked.join(' ') + '] shaked'
+            let log = ' ✂️ [' + shaked.join(' ') + '] shaked, [2]'
             console.log(log)
           } else {
-            let log = ' ✂️ [' + rule.selector + '] shaked'
+            let log = ' ✂️ [' + rule.selector + '] shaked, [3]'
             console.log(log)
           }
           rule.selectors = result.selectors
