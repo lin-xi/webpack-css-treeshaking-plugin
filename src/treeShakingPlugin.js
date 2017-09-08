@@ -45,12 +45,12 @@ module.exports = postcss.plugin('list-selectors', function (options) {
               if (_.includes(['comment', 'combinator', 'pseudo'], node.type)) continue
               for (let j = 0, len2 = node.nodes.length; j < len2; j++) {
                 let n = node.nodes[j]
-                if (!notCache[n.toString()]) {
+                if (!notCache[n.value]) {
                   switch (n.type) {
                     case 'id':
                     case 'class':
-                      if (!classInJs(n.toString())) {
-                        notCache[n.toString()] = true
+                      if (!classInJs(n.value)) {
+                        notCache[n.value] = true
                         result = false
                         break
                       }
