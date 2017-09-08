@@ -96,6 +96,8 @@ module.exports = postcss.plugin('list-selectors', function (options) {
           } else {
             let log = ' ✂️ [' + rule.selector + '] shaked, [3]'
             console.log(log)
+            console.log(rule.selectors.join(' '), '[4]')
+            console.log(result.selectors.join(' '), '[4]')
           }
           rule.selectors = result.selectors
         }
