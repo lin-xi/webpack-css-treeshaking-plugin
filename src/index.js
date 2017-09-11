@@ -3,7 +3,7 @@ var treeShakingPlugin = require('./treeShakingPlugin')
 
 class CSSTreeShakingPlugin {
   constructor (options) {
-    this.options = Object.assign({}, {remove: true, showInfo: true}, options)
+    this.options = Object.assign({}, {remove: false, ignore: []}, options)
   }
 
   apply (compiler) {
@@ -27,7 +27,8 @@ class CSSTreeShakingPlugin {
         const source = compilation.assets[filename].source()
         let listOpts = {
           include: '',
-          source: jsContents
+          source: jsContents,
+          opts: this.options
         }
         tasks.push(postcss(treeShakingPlugin(listOpts)).process(source).then(result => {
           let css = result.toString()

@@ -4,7 +4,16 @@ var _ = require('lodash')
 
 const classInJSRegex = (className) => {
   const re = new RegExp(`('|")([-_a-zA-Z0-9-\\s]*)?` + className + `([-_a-zA-Z0-9-\\s]*)('|")`, 'g')
-  return re
+  const vre = new RegExp(`(\{|,])?\s*` + className + `([-_a-zA-Z0-9-\\s]*)\:`, 'g')
+  return [re, vre]
+}
+
+const classIgnore = (exp, className) => {
+  let regexs = exp || []
+  return regexs.some(item => {
+    const re = new RegExp(item, 'g')
+    return re.test(className)
+  })
 }
 
 /**
@@ -16,6 +25,7 @@ const classInJSRegex = (className) => {
 module.exports = postcss.plugin('list-selectors', function (options) {
   let opts = options
   let notCache = {}
+  let config = options.opts
 
   return function (cssRoot, postcssResult) {
     // Run through all the rules and accumulate a list of selectors
@@ -25,7 +35,9 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       if (opts.ignore && opts.ignore.indexOf(className) !== -1) {
         return true
       }
-      return classInJSRegex(className).test(opts.source)
+      return classInJSRegex.some(item => {
+        return item.test(opts.source)
+      })
     }
 
     let checkRule = (rule) => {
@@ -78,25 +90,33 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       })
     }
 
+    let start = Date.now()
     cssRoot.walkRules(function (rule) {
       // Ignore keyframes, which can log e.g. 10%, 20% as selectors
       if (rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name)) return
       checkRule(rule).then(result => {
         if (result.selectors.length === 0) {
           let log = ' ✂️ [' + rule.selector + '] shaked, [1]'
+          if (classIgnore(rule.selector)) return
+          if (config.remove) {
+            rule.remove()
+          }
           console.log(log)
-          rule.remove()
         } else {
           let shaked = rule.selectors.filter(item => {
             return result.selectors.indexOf(item) === -1
           })
+          if (classIgnore(rule.selector)) return
           if (shaked && shaked.length > 0) {
             let log = ' ✂️ [' + shaked.join(' ') + '] shaked, [2]'
             console.log(log)
           }
-          rule.selectors = result.selectors
+          if (config.remove) {
+            rule.selectors = result.selectors
+          }
         }
       })
     })
+    console.log('[total time]:', ((Date.now() - start) / 1000).toFixed(2) + 's')
   }
 })
