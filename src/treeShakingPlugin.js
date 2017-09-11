@@ -35,7 +35,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       if (opts.ignore && opts.ignore.indexOf(className) !== -1) {
         return true
       }
-      return classInJSRegex.some(item => {
+      return classInJSRegex().some(item => {
         return item.test(opts.source)
       })
     }
@@ -97,7 +97,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       checkRule(rule).then(result => {
         if (result.selectors.length === 0) {
           let log = ' ✂️ [' + rule.selector + '] shaked, [1]'
-          if (classIgnore(rule.selector)) return
+          if (classIgnore(config.ignore, rule.selector)) return
           if (config.remove) {
             rule.remove()
           }
@@ -106,7 +106,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
           let shaked = rule.selectors.filter(item => {
             return result.selectors.indexOf(item) === -1
           })
-          if (classIgnore(rule.selector)) return
+          if (classIgnore(config.ignore, rule.selector)) return
           if (shaked && shaked.length > 0) {
             let log = ' ✂️ [' + shaked.join(' ') + '] shaked, [2]'
             console.log(log)
