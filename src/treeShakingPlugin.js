@@ -8,9 +8,9 @@ const classInJSRegex = (className) => {
   return [re, vre]
 }
 
-const classIgnore = (exp, className) => {
-  let regexs = exp || []
-  return regexs.some(item => {
+const classIgnore = (classes, className) => {
+  if (_.isEmpty(classes)) return false
+  return classes.some(item => {
     const re = new RegExp(item, 'g')
     return re.test(className)
   })
