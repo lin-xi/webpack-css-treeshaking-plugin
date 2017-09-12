@@ -8,14 +8,6 @@ const classInJSRegex = (className) => {
   return [re, vre]
 }
 
-const classIgnore = (classes, className) => {
-  if (_.isEmpty(classes)) return false
-  return classes.some(item => {
-    const re = new RegExp(item, 'g')
-    return re.test(className)
-  })
-}
-
 /**
  * The postcss plugin at the heart of everything.
  *
@@ -32,12 +24,19 @@ module.exports = postcss.plugin('list-selectors', function (options) {
     // parsed out by PostCSS
 
     let classInJs = (className) => {
-      if (opts.ignore && opts.ignore.indexOf(className) !== -1) {
-        return true
+      let exist = false
+      if (!_.isEmpty(opts.ignore)) {
+        exist = opts.ignore.some(item => {
+          const re = new RegExp(item, 'g')
+          return re.test(className)
+        })
       }
-      return classInJSRegex().some(item => {
-        return item.test(opts.source)
-      })
+      if (!exist) {
+        return classInJSRegex().some(item => {
+          return item.test(opts.source)
+        })
+      }
+      return true
     }
 
     let checkRule = (rule) => {
@@ -97,16 +96,14 @@ module.exports = postcss.plugin('list-selectors', function (options) {
       checkRule(rule).then(result => {
         if (result.selectors.length === 0) {
           let log = ' ✂️ [' + rule.selector + '] shaked, [1]'
-          if (classIgnore(config.ignore, rule.selector)) return
+          console.log(log)
           if (config.remove) {
             rule.remove()
           }
-          console.log(log)
         } else {
           let shaked = rule.selectors.filter(item => {
             return result.selectors.indexOf(item) === -1
           })
-          if (classIgnore(config.ignore, rule.selector)) return
           if (shaked && shaked.length > 0) {
             let log = ' ✂️ [' + shaked.join(' ') + '] shaked, [2]'
             console.log(log)
