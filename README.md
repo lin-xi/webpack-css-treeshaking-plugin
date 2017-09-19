@@ -1,5 +1,5 @@
-<p style="text-align: center">
-  <img src="css-tree-shaking.png" style="width: 64px; height: 64px"/>
+<p style="text-align: center; width: 128px;">
+  <img src="css-tree-shaking.png"/>
 </p>
 
 # webpack-css-treeshaking-plugin
