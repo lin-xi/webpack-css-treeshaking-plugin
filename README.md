@@ -1,3 +1,7 @@
+<p style="text-align: center">
+  <img src="css-tree-shaking.png"/>
+</p>
+
 # webpack-css-treeshaking-plugin
 
 [![Build Status](https://travis-ci.org/lin-xi/webpack-css-treeshaking-plugin.svg?branch=master)](https://travis-ci.org/lin-xi/webpack-css-treeshaking-plugin)
@@ -35,10 +39,12 @@ module.exports = {
 ```
 
 ## configuration
-+ remove,  boolean
++ remove  [boolean]
+
   remove unused css
 
-+ ignore,  array
++ ignore  [array]
+
   items can be a string or a regexp
   
 
