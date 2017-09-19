@@ -39,14 +39,14 @@ module.exports = {
 ```
 
 ## configuration
-+ remove  [boolean]
-
-  remove unused css
-
-+ ignore  [array]
-
-  items can be a string or a regexp
+ 
+ |------------|---------|-------------|------------------------------------|
+ |: property  |: type   |: default    |: discription                       |
+ | remove     | boolean | false       | whether to remove unused css       |
+ | ignore     | array   | []          |  items can be a string or a regexp |
+ |------------|---------|-------------|------------------------------------|
   
+
 
 ## architechture
 <img src="architechture.png">
