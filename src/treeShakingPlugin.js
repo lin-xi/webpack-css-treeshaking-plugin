@@ -32,7 +32,7 @@ module.exports = postcss.plugin('list-selectors', function (options) {
         })
       }
       if (!exist) {
-        return classInJSRegex().some(item => {
+        return classInJSRegex(className).some(item => {
           return item.test(opts.source)
         })
       }
