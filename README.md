@@ -1,4 +1,4 @@
-<p style="text-align: center; width: 128px;">
+<p style="text-align: center">
   <img src="css-tree-shaking.png"/>
 </p>
 
