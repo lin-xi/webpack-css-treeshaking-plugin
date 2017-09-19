@@ -1,5 +1,10 @@
 # webpack-css-treeshaking-plugin
 
+[![Build Status](https://travis-ci.org/lin-xi/webpack-css-treeshaking-plugin.svg?branch=master)](https://travis-ci.org/lin-xi/webpack-css-treeshaking-plugin)
+[![Coverage Status](https://coveralls.io/repos/github/lin-xi/webpack-css-treeshaking-plugin/badge.svg?branch=master)](https://coveralls.io/github/lin-xi/webpack-css-treeshaking-plugin?branch=master)
+[![npm package](https://img.shields.io/npm/v/webpack-css-treeshaking-plugin.svg)](https://www.npmjs.org/package/webpack-css-treeshaking-plugin)
+[![NPM downloads](http://img.shields.io/npm/dm/webpack-css-treeshaking-plugin.svg)](https://npmjs.org/package/webpack-css-treeshaking-plugin)
+
 a webpack plugin to shake unused css code
 
 -------
