@@ -4,7 +4,7 @@
   "description": "a webpack loader to shake unused css code.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/evelynlab/webpack-css-treeshaking-plugin"
+    "url": "https://github.com/lin-xi/webpack-css-treeshaking-plugin"
   },
   "main": "lib/index.js",
   "scripts": {
