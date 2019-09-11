@@ -25,8 +25,8 @@ module.exports = postcss.plugin('list-selectors', function (options) {
 
     let classInJs = (className) => {
       let exist = false
-      if (!_.isEmpty(opts.ignore)) {
-        exist = opts.ignore.some(item => {
+      if (!_.isEmpty(config.ignore)) {
+        exist = config.ignore.some(item => {
           const re = new RegExp(item, 'g')
           return re.test(className)
         })
